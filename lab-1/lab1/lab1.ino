@@ -1,39 +1,40 @@
 char num;                     //Variable to hold the input from serial
-int index;                    //Holds the index for the moorseCodes array, if the input was a number between 0 & 9
+int index;                    //Holds the index for the morseCodes array, if the input was a number between 0 & 9
 bool numAvail = false;        //To keep track of when there is a valid number available
 
-//Holds moorse codes for all the numbers. Index corresponds to the number.
-String moorseCodes[] = {"-----",
-                        ".----",
-                        "..---",
-                        "...--",
-                        "....-",
-                        ".....",
-                        "-....",
-                        "--...",
-                        "---..",
-                        "----."};
+//Holds morse codes for all the numbers. Index corresponds to the number.
+String morseCodes[] = {"-----",           // 0
+                        ".----",          // 1
+                        "..---",          // 2
+                        "...--",          // 3
+                        "....-",          // 4
+                        ".....",          // 5
+                        "-....",          // 6
+                        "--...",          // 7
+                        "---..",          // 8
+                        "----."           // 9
+                       };          
 
-// the setup routine runs once when you press reset:
+//The setup code that runs once
 void setup() {
-  // initialize serial:
+  //Initialize serial:
   Serial.begin(9600);
 
-  // initialize digital pin 13 as an output.
+  //Initialize digital pin 13 as an output, which is the LED-light
   pinMode(13, OUTPUT);
 }
 
-//Depending on the input number, display that moores code on the LED-light
+//Depending on the input number, display that mores code on the LED-light
 void loop() {
   if(numAvail)  {
-    //Get the moorse code corresponding to input number
-    String moorseCode = moorseCodes[index];
+    //Get the morse code corresponding to input number
+    String morseCode = morseCodes[index];
 
     //Loop though the code character by character. 
     //If it's a dot, then call the dotBlink() method, else call the dashBlink() method
     int i = 0;
     while(i < 5) {
-      String subCode = moorseCode.substring(i,i+1);
+      String subCode = morseCode.substring(i,i+1);
       if (subCode == ".") {
         dotBlink();
       } else {
