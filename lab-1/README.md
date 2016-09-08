@@ -57,7 +57,7 @@ In turn, these dot and dash functions turned on and delayed the `LED` light on t
     * We used this to see how the 0-9 digits are translated via dots and dashes to put into our array.
 
 - [Arduino - Reference Sheet] (https://www.arduino.cc/en/Reference/HomePage)
-    * Used the reference sheet to learn language syntax specific to Arduino. Eg. the function `splitstring` etc.
+    * Used the reference sheet to learn language syntax specific to Arduino. For example the function `splitstring`
 
 - Arduino - Built-in examples
     * Used the built-in examples in the Arduino software to learn how to initialize the serial port, read from serial port, initialize the LED-light and make the LED-light blink.
