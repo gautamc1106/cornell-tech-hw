@@ -39,13 +39,13 @@ That context was used to allow the Arduino to read the digit that the console wa
 
 ## Software Description
 
-Each digit in Morse Code is represented with dots and dashes.
+Each digit in Morse Code is represented with a series of dots and dashes.
 
 For example, the digit `3` in Morse Code is represented by 3 dots and 2 dashes: `...--`.
 
-The 0-9 digits were stored in a `char` type array with actual `.` and `-` representing the dots and dashes, respectively, as shown in the example above.
+The 0-9 digits were stored in a `String` type array with actual `.` and `-` representing the dots and dashes, respectively, as shown in the example above.
 
-Functions were created to represent how long the `LED` light would be delayed for both the `dot` and `dash` function.
+Functions were created to represent how long the `LED` light would blink for both the `dot` and `dash` functions.
 
 Based on what digit is input into the console, the dot and dash functions were called a certain number of times.
 
@@ -55,3 +55,9 @@ In turn, these dot and dash functions turned on and delayed the `LED` light on t
 
 - [Wikipedia - Morse Code - Chart of the Morse code letters and numbers](https://www.wikiwand.com/en/Morse_code)
     * We used this to see how the 0-9 digits are translated via dots and dashes to put into our array.
+
+- [Arduino - Reference Sheet] (https://www.arduino.cc/en/Reference/HomePage)
+    * Used the reference sheet to learn language syntax specific to Arduino. Eg. the function `splitstring` etc.
+
+- [Arduino - Built-in examples]
+    * Used the built-in examples in the Arduino software to learn how to initialize the serial port, read from serial port, initialize the LED-light and make the LED-light blink.
