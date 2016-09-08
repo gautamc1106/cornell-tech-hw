@@ -3,6 +3,8 @@
 > Jaldeep Archaya
 >
 > Frances Coronel
+>
+> Avash Rao
 
 ## Objective
 
