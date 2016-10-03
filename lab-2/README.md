@@ -2,8 +2,6 @@
 
 > Frances Coronel
 >
-> Mitchell Napolitano
->
 > Sindhu Ravindra
 
 ## Objective
@@ -16,9 +14,23 @@ We connected the USB cable to the `Arduino Fio` and set up the `IDE` so we can c
 
 That code was used to allow the Arduino to read user input from button pushes, translate the button input to a number and output that number to the `LED` dot matrix display.
 
+## Picture
+
+![board](board.jpg)
+
+## Video
+
+Please see `demo.mp4`.
+
+## Code
+
+Please look under the folder called `morse-intrepreter`.
+
 ## System-Level Block Diagram
 
-INSERT DIAGRAM HERE
+![sys-1](sys-1.jpeg)
+![sys-2](sys-2.jpeg)
+![sys-3](sys-3.jpeg)
 
 ## Software Description
 
