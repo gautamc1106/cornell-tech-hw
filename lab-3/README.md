@@ -8,7 +8,7 @@
 
 ## Objective
 
-The objective of this lab is to create a wireless measurement device. The Arduino Fio and the range finder will be used to build a hand held device which which can measure the distance from the device.  The device will have a button, which will trigger transmission of the measurement readings to a computer using the XBee.
+The objective of this lab is to create a wireless measurement device. The Arduino Fio and the range finder will be used to build a hand held device which which can measure the distance from the device.  The device will have a button, which will trigger transmission of the measurement readings to a computer using the Xbee.
 
 ## Executive Summary
 
@@ -18,13 +18,15 @@ Once we verified they could communicate, we set up the single sonic range finder
 
 ## System-Level Block Diagram
 
+[INSERT DIAGRAM HERE]
+
 ## Software Description
 
 We set up the serial port and initialized the relevant button and LED pins and states.
 
 The interface for XBee was then setup using the serial port through the `Software Serial Library`.
 
-There was a loop made to check what the distance was at the current time and then that distance was printed to the computer using `xbee`'s module. This happened every 500 ms.
+There was a loop made to check what the distance was at the current time and then that distance was printed to the computer using `Xbee`'s module. This happened every 500 ms.
 
 ## References
 
