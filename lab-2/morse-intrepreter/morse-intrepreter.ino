@@ -9,31 +9,18 @@ const int COLS[] = {7, 3, 4 ,9, 5};   // arduino pins -> resistor -> 5 cathode c
 
      
 const unsigned char ZERO[] = {0x41, 0x41, 0x41, 0x7F,0x7F};
-
 const unsigned char ONE[] = {0x0, 0x0, 0x0, 0x0, 0x7F};
-
 const unsigned char TWO[] = {0x49, 0x49, 0x49,0x4F,0x79};
-
 const unsigned char THREE[] = {0x49, 0x49, 0x49, 0x49,0x7F};
-
 const unsigned char FOUR[] = {0x8, 0x8, 0x8, 0x78,0x7F};
-
 const unsigned char FIVE[] = {0x49, 0x49, 0x49,0x79,0x4F};
-
 const unsigned char SIX[] = {0x49, 0x49, 0x49, 0x7F,0x4F};
-
 const unsigned char SEVEN[] = {0x40, 0x40, 0x40, 0x7F, 0x40};
-
 const unsigned char EIGHT[] = {0x49, 0x49, 0x49,0x7F,0x7F};
-
 const unsigned char NINE[] = {0x49, 0x49, 0x49, 0x79,0x7F};
-
 const unsigned char ERROR_INPUT[] = {0x14, 0x8, 0x14, 0x63,0x63};
-
 const unsigned char* DIGITS[] = { ZERO, ONE, TWO, THREE, FOUR, FIVE, SIX, SEVEN, EIGHT, NINE};\
-
 const int num_press = 5; // maximum num of pushes to record input
-
 const long DOT_TIME = 300; //time limit for dot
 
 // the debouncing algorithm : https://www.arduino.cc/en/Tutorial/Debounce
@@ -53,7 +40,6 @@ void resetInputSignals() {               // Reset the input signal buffer and in
   inputSignalIndex = 0;
 }
 
-// follows https://newcircle.com/s/post/397/morse_code_transcoder_for_arduino
 int translateInput(byte input[]) {
   int num; bool flag = 0;                 // create num and flag variabls
   if (input[0] == 0)                     // if first byte is 0 - i.e. a dot:
