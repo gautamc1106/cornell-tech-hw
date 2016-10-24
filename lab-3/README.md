@@ -22,6 +22,8 @@ Once we verified they could communicate, we set up the single sonic range finder
 
 ## Software Description
 
+Through the `XCTU` program, the `PAN ID` was changed and the `DL` and `MY` addresses were made to be the opposite for the two `Xbee` modules. Ergo, the `DL` destination address for the first `Xbee` module was `5200` while it's `MY` source address was `1234`. For the second `xbee` module, this was simply inverted.
+
 We set up the serial port and initialized the relevant button and LED pins and states.
 
 The interface for XBee was then setup using the serial port through the `Software Serial Library`.
