@@ -1,38 +1,33 @@
-/** LAB 3 */
-
-// set up serial port
+// including software serial library
 #include <SoftwareSerial.h>
 
-// to see input on LED
-const int buttonPin = 12;
-int buttonState = 0, ledPin = 3, ledValue = 0;
+// serialPin = where serial output is coming in from
+// distance = distance relayed by range finder
+// buttonPin = where button is located
+int serialPin = 2, distance = 0, buttonPin = 3, buttonState = 0;
+char newLine = "\n"; // single measurement is complete
 
-int ledPin = 3;
-int ledValue = 0;
+// rxPin: the pin on which to receive serial data
+// txPin: the pin on which to transmit serial data
+int rxPin = 2, txPin = 3;
 
-// for Arduino Fio
-int rxPin = 0, txPin = 1;
+// set up a new serial object
+SoftwareSerial rangeFinder (rxPin, txPin);
 
-// interface to xbee using serial port
-SoftwareSerial xbee(rxPin, txPin);
-
-// setting up pin modes
 void setup() {
-  pinMode(ledPin, INPUT);
-  Serial.begin(9600);
+  pinMode(serialPin, INPUT);
+  pinMode(rxPin, INPUT);
+  pinMode(txPin, OUTPUT);
+  pinMode(buttonPin, INPUT);
+  rangeFinder.begin(19200);
 }
 
-// loop to read button pin state
 void loop() {
-  // check what distance is
-  ledValue = pulseIn(ledPin, HIGH);
-  Serial.print(ledValue);
-  Serial.print("\n");
+  distance = pulseIn(serialPin, HIGH);
   buttonState = digitalRead(buttonPin);
-  // if button is pressed, print out distance
   if (buttonState == HIGH) {
-    xbee.print(ledValue);
-    xbee.print("\n");
-    delay(500);
+    rangeFinder.print(distance);
+    rangeFinder.print(newLine);
+    delay(100);
   }
 }
