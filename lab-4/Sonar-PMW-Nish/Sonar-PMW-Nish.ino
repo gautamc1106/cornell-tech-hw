@@ -65,7 +65,7 @@ long getDistance() {
     pulseTime =  sum / count;
 
   /* Convert to cms */
-  cms = pulseTime / 10;
+  cms = pulseTime;
 
   return cms;
 }
@@ -74,7 +74,7 @@ long getDistance() {
 void measurements(int pos) {
   myservo.write(pos);              // tell servo to go to position in variable 'pos'
   delay(15);                       // waits 15ms for the servo to reach the position
-  
+
   digitalWrite(sonarPin, HIGH);
   char pos_buffer[10];
   itoa(pos, pos_buffer, 10);
@@ -89,14 +89,32 @@ void measurements(int pos) {
 
 
 void loop() {
-  for (pos = 0; pos <= 180; pos += 10) { // goes from 0 degrees to 180 degrees
-    measurements(pos);
+  int start_degree;
+  int end_degree;
+  int increment;
+
+  while (Serial.available() > 0) {
+    start_degree = Serial.parseInt();
+    end_degree = Serial.parseInt();
+    increment = Serial.parseInt();
+    Serial.println(start_degree);
+    Serial.println(end_degree);
+    Serial.println(increment);
+    for (pos = start_degree; pos <= end_degree; pos += increment) { // goes from 0 degrees to 180 degrees
+      if (Serial.read() != NULL) {
+        break;
+      }
+      measurements(pos);
+    }
+
+    for (pos = end_degree; pos >= start_degree; pos -= increment) { // goes from 180 degrees to 0 degrees
+      if (Serial.read() != NULL) {
+        break;
+      }
+      measurements(pos);
+    }
   }
-  
-  for (pos = 180; pos >= 0; pos -= 10) { // goes from 180 degrees to 0 degrees
-    measurements(pos);
-  }
-  
+
 }
 
 
