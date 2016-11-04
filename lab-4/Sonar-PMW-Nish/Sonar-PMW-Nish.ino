@@ -7,6 +7,7 @@
 #include <Servo.h>
 #define NUMREAD 5
 
+
 // Digital input for recieving PMW signal from sensor
 const int pwmPin = 7;
 const int sonarPin = 3;             // pin number of the sonar
@@ -14,7 +15,9 @@ const int sonarPin = 3;             // pin number of the sonar
 Servo myservo;  // create servo object to control a servo
 
 int pos = 0;    // variable to store the servo position
-
+int start_degree;
+int end_degree;
+int increment = 0;
 
 //Returns the length of the pulse in microseconds
 unsigned long highPulse = 0;
@@ -89,32 +92,29 @@ void measurements(int pos) {
 
 
 void loop() {
-  int start_degree;
-  int end_degree;
-  int increment;
-
   while (Serial.available() > 0) {
     start_degree = Serial.parseInt();
     end_degree = Serial.parseInt();
     increment = Serial.parseInt();
-    Serial.println(start_degree);
-    Serial.println(end_degree);
-    Serial.println(increment);
+    Serial.print("Fio received: ");
+    Serial.print(start_degree);
+    Serial.print(",");
+    Serial.print(end_degree);
+    Serial.print(",");
+    Serial.print(increment);
+    Serial.write(10);
+  }
+  if (increment != 0) {
     for (pos = start_degree; pos <= end_degree; pos += increment) { // goes from 0 degrees to 180 degrees
-      if (Serial.read() != NULL) {
-        break;
-      }
+      if (Serial.available() > 0) { break; }
       measurements(pos);
     }
 
-    for (pos = end_degree; pos >= start_degree; pos -= increment) { // goes from 180 degrees to 0 degrees
-      if (Serial.read() != NULL) {
-        break;
-      }
+    for (pos = end_degree-increment; pos >= start_degree+increment; pos -= increment) { // goes from 180 degrees to 0 degrees
+      if (Serial.available() > 0) { break; }
       measurements(pos);
     }
   }
-
 }
 
 
