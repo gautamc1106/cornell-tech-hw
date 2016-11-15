@@ -7,6 +7,7 @@
 #include <Servo.h>
 #define NUMREAD 5
 
+
 // Digital input for recieving PMW signal from sensor
 const int pwmPin = 7;
 const int sonarPin = 3;             // pin number of the sonar
@@ -14,7 +15,9 @@ const int sonarPin = 3;             // pin number of the sonar
 Servo myservo;  // create servo object to control a servo
 
 int pos = 0;    // variable to store the servo position
-
+int start_degree;
+int end_degree;
+int increment = 0;
 
 //Returns the length of the pulse in microseconds
 unsigned long highPulse = 0;
@@ -65,7 +68,7 @@ long getDistance() {
     pulseTime =  sum / count;
 
   /* Convert to cms */
-  cms = pulseTime / 10;
+  cms = pulseTime;
 
   return cms;
 }
@@ -74,7 +77,7 @@ long getDistance() {
 void measurements(int pos) {
   myservo.write(pos);              // tell servo to go to position in variable 'pos'
   delay(15);                       // waits 15ms for the servo to reach the position
-  
+
   digitalWrite(sonarPin, HIGH);
   char pos_buffer[10];
   itoa(pos, pos_buffer, 10);
@@ -89,14 +92,29 @@ void measurements(int pos) {
 
 
 void loop() {
-  for (pos = 0; pos <= 180; pos += 10) { // goes from 0 degrees to 180 degrees
-    measurements(pos);
+  while (Serial.available() > 0) {
+    start_degree = Serial.parseInt();
+    end_degree = Serial.parseInt();
+    increment = Serial.parseInt();
+    Serial.print("Fio received: ");
+    Serial.print(start_degree);
+    Serial.print(",");
+    Serial.print(end_degree);
+    Serial.print(",");
+    Serial.print(increment);
+    Serial.write(10);
   }
-  
-  for (pos = 180; pos >= 0; pos -= 10) { // goes from 180 degrees to 0 degrees
-    measurements(pos);
+  if (increment != 0) {
+    for (pos = start_degree; pos <= end_degree; pos += increment) { // goes from 0 degrees to 180 degrees
+      if (Serial.available() > 0) { break; }
+      measurements(pos);
+    }
+
+    for (pos = end_degree-increment; pos >= start_degree+increment; pos -= increment) { // goes from 180 degrees to 0 degrees
+      if (Serial.available() > 0) { break; }
+      measurements(pos);
+    }
   }
-  
 }
 
 
