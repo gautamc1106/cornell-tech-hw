@@ -84,16 +84,7 @@ unsigned int Process::Select (unsigned int cursp)
   else {
     Process::current_process->_sp = cursp;
     /* put process into the ready queue */
-	if (Process::current_process->_blocked == 0)
-	{
-		Process::_insert(Process::current_process);
-	}
-	else
-	{
-#ifdef DEBUG_THREADS
-		Serial.println(F("process blocked"));
-#endif
-	}
+    Process::_insert (Process::current_process);
   }
   Process::current_process = Process::_delete();
   if (Process::current_process) {
@@ -106,7 +97,7 @@ unsigned int Process::Select (unsigned int cursp)
 
 /* Hook from C to access this function */
 extern "C" {
-unsigned int process_select (unsigned int cursp)
+__attribute__((used)) unsigned int process_select (unsigned int cursp)
 {  return Process::Select (cursp); }
 }
 
@@ -122,7 +113,8 @@ extern "C" void _launch_function (Process *p)
 }
 
 /*
- * Stack: save 32 regs, +2 for entry point +2 for ret address
+ * Stack: save 32 regs, +2 for entry point +2 for ret address, +1 for
+ * status register
  */
 #define EXTRA_SPACE 37
 #define EXTRA_PAD 4
@@ -132,9 +124,6 @@ Process::Process (int sz)
   unsigned long stk;
   int i;
   unsigned char *stkspace;
-
-  //Serial.println(F("Creating proc!"));
-  _blocked = 0;
 
   /* Create a new process */
   sz += EXTRA_SPACE + EXTRA_PAD;
@@ -192,43 +181,28 @@ Lock::Lock()
 void Lock::Acquire()
 {
   cli();
-
-#ifdef DEBUG_THREADS
-  Serial.println(F("ATTEMPT ACQUIRE"));
-#endif
-
-  while (_lock) {
-#ifdef DEBUG_THREADS
-	  Serial.println(F("FAILED ACQUIRE"));
-#endif
-    Process::current_process->_mkblocked ();
+  if (_lock) {
+    assert (Process::current_process);
     _insert (Process::current_process);
-    process_yield ();
-    cli();
+    process_timer_interrupt ();
   }
-#ifdef DEBUG_THREADS
-  Serial.println(F("ACQUIRE"));
-#endif
-
-  _lock = 1;
-  sei();
+  else {
+    _lock = 1;
+    sei();
+  }
 }
 
 int Lock::_release ()
 {
   Process *p;
 
-  _lock = 0;
-
-#ifdef DEBUG_THREADS
-  Serial.println(F("RELEASE"));
-#endif
-
   p = _delete ();
   if (p) {
-    p->_clrblocked ();
     Process::_insert (p);
     return 1;
+  }
+  else {
+    _lock = 0;
   }
   return 0;
 }
@@ -237,7 +211,7 @@ void Lock::Release()
 {
   cli();
   if (_release ()) {
-    process_yield ();
+    process_timer_interrupt ();
   }
   else {
     sei ();
@@ -267,25 +241,19 @@ Process *Lock::_delete ()
  *
  *------------------------------------------------------------------------
  */
-/* Constructor for a condition variable.
- * You should initialize any data structures you will use
- * for the condition variables here.  (Hint:  It would be wise to
- * have some sort of queue to keep track of blocked processes) */
 Cond::Cond (Lock *l)
 {
-  _hd = _tl = NULL; /* Head and tail of waiting queue empty */
-  _l = l;  /* Lock associated with this condition variable */
+  _hd = _tl = NULL;
+  _l = l;
 }
 
-/* Cause a thread to block. */
 void Cond::wait ()
 {
-  cli();  /* disable interrupts */
+  cli();
   assert (Process::current_process);
-  Process::current_process->_mkblocked ();
   _insert (Process::current_process);
   _l->_release ();
-  process_yield (); /*Run another thread.  Interrupts are automatically re-enabled here*/
+  process_timer_interrupt ();
 }
 
 int Cond::waiting ()
@@ -300,14 +268,12 @@ void Cond::signal ()
   cli();
   p = _delete ();
   if (p) {
-    p->_clrblocked ();
     Process::_insert (p);
-    sei ();
-    process_yield ();
+    process_timer_interrupt ();
   }
   else {
     if (_l->_release ()) {
-      process_yield ();
+      process_timer_interrupt ();
     }
     else {
       sei ();

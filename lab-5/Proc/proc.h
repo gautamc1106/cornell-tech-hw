@@ -7,12 +7,12 @@
  */
 #ifndef __PROC_H__
 #define __PROC_H__
-//#define DEBUG_THREADS
+
 #include "proc_intr.h"
-#include "Arduino.h"
+
 class Process {
  public:
-  Process (int stk_size = 100);
+  Process (int stk_size = 300);
   ~Process ();
   
   virtual void loop () = 0;	/* every class has to override this
@@ -37,19 +37,7 @@ class Process {
  private:
   unsigned int _sp;		/* stack pointer: state for the process! */
   Process *_next;		/* Queue pointer for process */
-  volatile int _blocked;	/* blocked in some other queue */
   void *_stk;			/* allocated space */
-
-  void _mkblocked() { _blocked = 1; 
-  #ifdef DEBUG_THREADS
-  Serial.println(F("MKBLOCKED"));
-  #endif
-  }
-  void _clrblocked() { _blocked = 0;
-#ifdef DEBUG_THREADS
-  Serial.println(F("CLRBLOCKED"));
-#endif
-  }
 
   static Process *ready_hd, *ready_tl; /* ready queue */
   static Process *current_process;
