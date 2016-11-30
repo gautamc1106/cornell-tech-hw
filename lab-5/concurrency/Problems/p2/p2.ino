@@ -33,25 +33,49 @@ class MatingArea {
      * useful to declare additional condition variables
      * to solve the problem.  We just left these here as
      * a reminder on the syntax. */
-    Lock* _l;
-    Cond* _c;
+    Lock* _l_he;
+    Lock* _l_she;
+    Lock* _l_it;    
+    Cond* _c_he;
+    Cond* _c_she;
+    Cond* _c_it;
 
   public:
     MatingArea () {  //Constructor for club
-      _l = new Lock();
-      _c = new Cond(_l);
+      _l_he = new Lock();
+      _l_she = new Lock();
+      _l_it = new Lock();
+      _c_he = new Cond(_l_he);
+      _c_she = new Cond(_l_she);
+      _c_it = new Cond(_l_it);
     }
 
     void he_ready() {
       /*TODO: Only return when there is a she and an it also ready*/
+      // No atomic operation! Set locks!
+      if (!_c_she->waiting() && !_c_it->waiting()) {
+        _c_he->wait();
+      }
+      _c_she->signal();
+      _c_it->signal();
     }
 
     void she_ready() {
       /*TODO: Only return when there is a he and an it also ready*/
+      if (!_c_he->waiting() && !_c_it->waiting()) {
+        _c_she->wait();
+      }
+      _c_he->signal();
+      _c_it->signal();
     }
 
     void it_ready() {
       /*TODO: Only return when there is a he and a she also ready*/
+      if (!_c_he->waiting() && !_c_she->waiting()) {
+        _c_it->wait();
+      }
+      _c_he->signal();
+      _c_she->signal();
     }
 };
 

@@ -38,12 +38,14 @@ class Club {
    * to solve the problem.  We just left these here as
    * a reminder on the syntax. */
   Lock *_l;
-  Cond *_c; 
+  Cond *_c;
+  int nr = 0;
+  int nf = 0;
 
   public:
     Club () {  //Constructor for club
       _l = new Lock();
-      _c = new Cond(_l);
+      _c = new Cond(_l);      
     }
 
     ~Club () { //Destructor for club
@@ -54,19 +56,45 @@ class Club {
     void redditor_enter() {
       /*TODO: make it so that this function only returns when it is safe for
        *      redditor to enter the club. */
+      _c->lock();
+      if (nf > 0) {
+        _c->wait();
+      }
+      nr++;
+      Serial.print("Redditors in: ");
+      Serial.print(nr);
+      Serial.print(" - 4channers in: ");
+      Serial.println(nf);
+      _c->unlock();
     }
 
     void redditor_exit() {
       /*TODO: Exit the club. */
+      _c->lock();
+      nr--;
+      _c->signal();
     }
 
     void fourchanner_enter() {
       /*TODO: make it so that this function only returns when it is safe for
        *      redditor to enter the club. */
+      _c->lock();
+      if (nr > 0) {
+        _c->wait();
+      }
+      nf++;
+      Serial.print("Redditors in: ");
+      Serial.print(nr);
+      Serial.print(" - Fourchanners in: ");
+      Serial.println(nf);
+      _c->unlock(); 
     }
 
     void fourchanner_exit() {
       /*TODO: Exit the club. */
+      _c->lock();
+      nf--;
+      _c->signal();
     }
 };
 
