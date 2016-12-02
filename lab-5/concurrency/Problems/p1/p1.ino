@@ -39,8 +39,8 @@ class Club {
    * a reminder on the syntax. */
   Lock *_l;
   Cond *_c;
-  int nr = 0;
-  int nf = 0;
+  int nr = 0; // Number of redditors in the club
+  int nf = 0; // Number of fourchanners in the club
 
   public:
     Club () {  //Constructor for club
@@ -61,10 +61,6 @@ class Club {
         _c->wait();
       }
       nr++;
-      Serial.print("Redditors in: ");
-      Serial.print(nr);
-      Serial.print(" - 4channers in: ");
-      Serial.println(nf);
       _c->unlock();
     }
 
@@ -72,7 +68,12 @@ class Club {
       /*TODO: Exit the club. */
       _c->lock();
       nr--;
-      _c->signal();
+      if (!_c->waiting() && nr == 0) { 
+        _c->signal();
+      } else {
+        Serial.println("trying to exit");
+        _c->unlock();
+      }
     }
 
     void fourchanner_enter() {
@@ -83,10 +84,6 @@ class Club {
         _c->wait();
       }
       nf++;
-      Serial.print("Redditors in: ");
-      Serial.print(nr);
-      Serial.print(" - Fourchanners in: ");
-      Serial.println(nf);
       _c->unlock(); 
     }
 
@@ -94,7 +91,11 @@ class Club {
       /*TODO: Exit the club. */
       _c->lock();
       nf--;
-      _c->signal();
+      if (!_c->waiting() && nf == 0) { 
+        _c->signal();
+      } else {
+        _c->unlock();
+      } 
     }
 };
 
@@ -109,13 +110,17 @@ public:
   }
 
   void loop () {
-  	daclub.redditor_enter();
+    daclub.redditor_enter();
     Serial.print("Redditor ");
     Serial.print(_id);
     Serial.println(": in the club");
     /* TODO: light up column #_id on the LED matrix */
-    hang_out();
+    delay(1000);
     daclub.redditor_exit();
+    Serial.print("Redditor ");
+    Serial.print(_id);
+    Serial.println(": out the club");
+    delay(1000);
   }
 };
 
@@ -128,13 +133,17 @@ public:
   }
 
   void loop () {
-  	daclub.fourchanner_enter();
+    daclub.fourchanner_enter();
     Serial.print("Fourchanner ");
     Serial.print(_id);
     Serial.println(": in the club");
     /* TODO: light up column #_id on the LED matrix */
-    hang_out();
+    delay(1000);
     daclub.fourchanner_exit();
+    Serial.print("Fourchanner ");
+    Serial.print(_id);
+    Serial.println(": out the club");
+    delay(1000);
   }
 };
 
