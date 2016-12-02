@@ -1,4 +1,4 @@
-__attribute__((used)) unsigned char _orig_sp_hi, _orig_sp_lo;
+unsigned char _orig_sp_hi, _orig_sp_lo;
 
 void process_begin ()
 {
@@ -36,7 +36,7 @@ void process_yield ()
   asm volatile ("rjmp process_timer_interrupt\n\t");
 }
 
-__attribute__((used)) void process_timer_interrupt()
+void process_timer_interrupt()
 {
   asm volatile (
 		"push r31\n\t"
