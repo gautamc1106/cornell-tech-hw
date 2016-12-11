@@ -16,10 +16,6 @@
  Modify only the code of the class Club to make the program
  correct. (but add the LED manipulation to the other classes)
 
- Use the LED matrix for visual feedback on the state of the system.
- Look at the "TODO" comments. Pick different LEDs for the four 
- processes.
-
  Place your synchronization variables inside the Club instance.
  */
 
@@ -27,7 +23,8 @@
 
 
 void hang_out() {
-  delay(random(300,1500)); //waste time
+  //delay(random(300,1500)); //waste time
+  delay(2000); //waste time
 }
 
 class Club {
@@ -38,14 +35,14 @@ class Club {
    * to solve the problem.  We just left these here as
    * a reminder on the syntax. */
   Lock *_l;
-  Cond *_c;
+  Cond *_c; 
   int nr = 0; // Number of redditors in the club
   int nf = 0; // Number of fourchanners in the club
-
+  
   public:
     Club () {  //Constructor for club
       _l = new Lock();
-      _c = new Cond(_l);      
+      _c = new Cond(_l);
     }
 
     ~Club () { //Destructor for club
@@ -54,10 +51,9 @@ class Club {
     }
     
     void redditor_enter() {
-      /*TODO: make it so that this function only returns when it is safe for
-       *      redditor to enter the club. */
       _c->lock();
       if (nf > 0) {
+        Serial.println(F("Redditor waiting"));
         _c->wait();
       }
       nr++;
@@ -65,22 +61,21 @@ class Club {
     }
 
     void redditor_exit() {
-      /*TODO: Exit the club. */
       _c->lock();
+      Serial.print(F("Number of redditors in the club "));
+      Serial.println(nr);
       nr--;
-      if (!_c->waiting() && nr == 0) { 
+      if (_c->waiting() && nr == 0) { 
         _c->signal();
       } else {
-        Serial.println("trying to exit");
         _c->unlock();
       }
     }
 
     void fourchanner_enter() {
-      /*TODO: make it so that this function only returns when it is safe for
-       *      redditor to enter the club. */
       _c->lock();
       if (nr > 0) {
+        Serial.println(F("4chan waiting"));
         _c->wait();
       }
       nf++;
@@ -88,10 +83,11 @@ class Club {
     }
 
     void fourchanner_exit() {
-      /*TODO: Exit the club. */
       _c->lock();
+      Serial.print(F("Number of fourchanners in the club "));
+      Serial.println(nf);
       nf--;
-      if (!_c->waiting() && nf == 0) { 
+      if (_c->waiting() && nf == 0) { 
         _c->signal();
       } else {
         _c->unlock();
@@ -99,7 +95,7 @@ class Club {
     }
 };
 
-Club daclub;
+Club *daclub;
 
 class Redditor: Process {
   int _id;
@@ -110,17 +106,20 @@ public:
   }
 
   void loop () {
-    daclub.redditor_enter();
-    Serial.print("Redditor ");
+    Serial.print(F("Redditor "));
     Serial.print(_id);
-    Serial.println(": in the club");
+    Serial.println(F(": trying to enter"));
+    daclub->redditor_enter();
+    Serial.print(F("Redditor "));
+    Serial.print(_id);
+    Serial.println(F(": in the club"));
     /* TODO: light up column #_id on the LED matrix */
-    delay(1000);
-    daclub.redditor_exit();
-    Serial.print("Redditor ");
+    hang_out();
+    daclub->redditor_exit();
+    Serial.print(F("Redditor "));
     Serial.print(_id);
-    Serial.println(": out the club");
-    delay(1000);
+    Serial.println(F(": out the club"));
+    hang_out();
   }
 };
 
@@ -133,17 +132,20 @@ public:
   }
 
   void loop () {
-    daclub.fourchanner_enter();
-    Serial.print("Fourchanner ");
+    Serial.print(F("Fourchanner "));
     Serial.print(_id);
-    Serial.println(": in the club");
+    Serial.println(F(": trying to enter"));
+    daclub->fourchanner_enter();
+    Serial.print(F("Fourchanner "));
+    Serial.print(_id);
+    Serial.println(F(": in the club"));
     /* TODO: light up column #_id on the LED matrix */
-    delay(1000);
-    daclub.fourchanner_exit();
-    Serial.print("Fourchanner ");
+    hang_out();
+    daclub->fourchanner_exit();
+    Serial.print(F("Fourchanner "));
     Serial.print(_id);
-    Serial.println(": out the club");
-    delay(1000);
+    Serial.println(F(": out the club"));
+    hang_out();
   }
 };
 
@@ -156,8 +158,7 @@ void setup() {
   
   Serial.begin(9600); // open serial terminal
   Process::Init();  // start the threading library
-  
-  daclub = Club();
+  daclub = new Club();
   r = new Redditor(1); //start first thread
   r = new Redditor(2); //start second thread
   f = new Fourchanner(4); //start third thread

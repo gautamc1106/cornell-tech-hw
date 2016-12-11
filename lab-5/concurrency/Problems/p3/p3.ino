@@ -51,7 +51,7 @@ class CalcThread : Process {
 
 CalcThread* threads [3];
 
-class Sum : CalcThread {
+class Sum : public CalcThread {
 
   int _id;
   int _iteration;
@@ -85,7 +85,7 @@ class Sum : CalcThread {
     }
 };
 
-class Mean : CalcThread {
+class Mean : public CalcThread {
 
   int _id;
   int _iteration;
@@ -119,7 +119,7 @@ class Mean : CalcThread {
     }
 };
 
-class Printer : CalcThread {
+class Printer : public CalcThread {
 
   int _id;
   int _iteration;
@@ -155,16 +155,12 @@ class Printer : CalcThread {
 // the setup routine runs once when you press reset:
 void setup() {
 
-  Sum *s;
-  Mean *m;
-  Printer *p;
-  
   Serial.begin(9600); // open serial terminal
   Process::Init();  // start the threading library
 
-  s = new Sum(1); //start first thread
-  m = new Mean(2); //start second thread
-  p = new Printer(3); //start third thread
+  threads[0] = new Sum(1); //start first thread
+  threads[1] = new Mean(2); //start second thread
+  threads[2] = new Printer(3); //start third thread
 }
 
 // the loop routine runs over and over again forever:
