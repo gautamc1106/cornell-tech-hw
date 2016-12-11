@@ -23,8 +23,7 @@
 
 
 void hang_out() {
-  //delay(random(300,1500)); //waste time
-  delay(2000); //waste time
+  delay(random(300,1500)); //waste time
 }
 
 class Club {
@@ -51,46 +50,46 @@ class Club {
     }
     
     void redditor_enter() {
+      delay(100);
       _c->lock();
       if (nf > 0) {
-        Serial.println(F("Redditor waiting"));
         _c->wait();
       }
       nr++;
       _c->unlock();
+      hang_out();
     }
 
     void redditor_exit() {
       _c->lock();
-      Serial.print(F("Number of redditors in the club "));
-      Serial.println(nr);
       nr--;
       if (_c->waiting() && nr == 0) { 
         _c->signal();
       } else {
         _c->unlock();
+        hang_out();
       }
     }
 
     void fourchanner_enter() {
+      delay(100);
       _c->lock();
       if (nr > 0) {
-        Serial.println(F("4chan waiting"));
         _c->wait();
       }
       nf++;
       _c->unlock(); 
+      hang_out();
     }
 
     void fourchanner_exit() {
       _c->lock();
-      Serial.print(F("Number of fourchanners in the club "));
-      Serial.println(nf);
       nf--;
       if (_c->waiting() && nf == 0) { 
         _c->signal();
       } else {
         _c->unlock();
+        hang_out();
       } 
     }
 };
@@ -106,15 +105,18 @@ public:
   }
 
   void loop () {
-    Serial.print(F("Redditor "));
-    Serial.print(_id);
-    Serial.println(F(": trying to enter"));
+    //Serial.print(F("Redditor "));
+    //Serial.print(_id);
+    //Serial.println(F(": trying to enter"));
     daclub->redditor_enter();
     Serial.print(F("Redditor "));
     Serial.print(_id);
     Serial.println(F(": in the club"));
     /* TODO: light up column #_id on the LED matrix */
     hang_out();
+    //Serial.print(F("Redditor "));
+    //Serial.print(_id);
+    //Serial.println(F(": trying to exit"));
     daclub->redditor_exit();
     Serial.print(F("Redditor "));
     Serial.print(_id);
@@ -132,15 +134,18 @@ public:
   }
 
   void loop () {
-    Serial.print(F("Fourchanner "));
-    Serial.print(_id);
-    Serial.println(F(": trying to enter"));
+    //Serial.print(F("Fourchanner "));
+    //Serial.print(_id);
+    //Serial.println(F(": trying to enter"));
     daclub->fourchanner_enter();
     Serial.print(F("Fourchanner "));
     Serial.print(_id);
     Serial.println(F(": in the club"));
     /* TODO: light up column #_id on the LED matrix */
     hang_out();
+    //Serial.print(F("Fourchanner "));
+    //Serial.print(_id);
+    //Serial.println(F(": trying to exit"));
     daclub->fourchanner_exit();
     Serial.print(F("Fourchanner "));
     Serial.print(_id);
