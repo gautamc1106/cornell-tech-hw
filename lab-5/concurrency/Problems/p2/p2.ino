@@ -33,25 +33,83 @@ class MatingArea {
      * useful to declare additional condition variables
      * to solve the problem.  We just left these here as
      * a reminder on the syntax. */
-    Lock* _l;
-    Cond* _c;
+    Lock* _l_he;
+    Cond* _c_he;
+    Lock* _l_she;
+    Cond* _c_she;
+    Lock* _l_it;
+    Cond* _c_it;   
+    Lock* _l_triad;
+    Cond* _c_triad;    
+    int nhe = 0; // Number of hes ready
+    int nshe = 0; // Number of shes ready
+    int nit = 0; // Number of its ready
+    bool ready = false;
 
   public:
-    MatingArea () {  //Constructor for club
-      _l = new Lock();
-      _c = new Cond(_l);
+    MatingArea () {
+      _l_he = new Lock();
+      _c_he = new Cond(_l_he);
+      _l_she = new Lock();
+      _c_she = new Cond(_l_she);
+      _l_it = new Lock();
+      _c_it = new Cond(_l_it);
+      _l_triad = new Lock();
+      _c_triad = new Cond(_l_triad);
     }
 
     void he_ready() {
       /*TODO: Only return when there is a she and an it also ready*/
+      _c_he->lock();
+      nhe++;   
+      if (nhe > 1) {
+        _c_he->wait();
+      }
+      
+      _c_triad->lock();
+      if (nshe == 0 || nit == 0) {
+        _c_triad->wait();
+      } 
+      nhe--;
+      _c_triad->signal();
+      _c_he->signal();     
+      
     }
 
     void she_ready() {
       /*TODO: Only return when there is a he and an it also ready*/
+      _c_she->lock();
+      nshe++;   
+      if (nshe > 1) {
+        _c_she->wait();
+      }
+      
+      _c_triad->lock();
+      if (nhe == 0 || nit == 0) {
+        _c_triad->wait();
+      } 
+      nshe--;
+      _c_triad->signal();
+      _c_she->signal();     
+      
     }
 
     void it_ready() {
       /*TODO: Only return when there is a he and a she also ready*/
+      _c_it->lock();
+      nit++;   
+      if (nit > 1) {
+        _c_it->wait();
+      }
+      
+      _c_triad->lock();
+      if (nshe == 0 || nhe == 0) {
+        _c_triad->wait();
+      }
+      nit--;
+      _c_triad->signal();
+      _c_it->signal();     
+      
     }
 };
 
