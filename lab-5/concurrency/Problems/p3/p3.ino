@@ -17,7 +17,15 @@
 
 #include <proc.h>
 
+const int ledcol[5] = {             // PINs for cathode columns of LED matrix
+  2, 3, 4, 5, 6
+};
+const int ledrow[7] = {             // PINs for anode rows of LED matrix
+  7, 8, 9, 10, 11, 12, 13
+};
 
+int n1=0; //no. of threads waiting for computations
+int n2=n; //no. of threads waiting for communication
 
 class Barrier {
 
@@ -32,13 +40,32 @@ class Barrier {
 
   public:
     Barrier (int n) {  //Constructor for club
-      _l = new Lock();
-      _c = new Cond(_l);
+      _l1 = new Lock();
+      _c1 = new Cond(_l1);
+      _l2 = new Lock();
+      _c2 = new Cond(_l2);
       _n = n;
     }
 
     void wait() {
-      /*TODO: Only return when _n other threads have also called wait*/
+      _c1->lock();
+      n1++;
+      if(n1>0)
+      {
+        _c1->wait();
+      }
+      if(n1==_n && n2==0)
+      {
+        n1=0;
+        n2++;
+      }
+      _c1_->unlock();
+      if(n2==_n && n1==0)
+      {
+        n2=0;
+      }
+    
+      
     }
 };
 
@@ -51,7 +78,7 @@ class CalcThread : Process {
 
 CalcThread* threads [3];
 
-class Sum : public CalcThread {
+class Sum : CalcThread {
 
   int _id;
   int _iteration;
@@ -71,7 +98,8 @@ class Sum : public CalcThread {
       delay(random(300, 1500)); //do some computation
       _iteration++;
       _num = random(1,100);
-      /* TODO: Make the pixel at (_id, _iteration) of the LED matrix light up (and stay lit)*/
+      digitalWrite(ledcol[_id],LOW);
+      digitalWrite(ledrow[_iteration],LOW);
       B.wait();
 
       int output = 0;
@@ -81,11 +109,12 @@ class Sum : public CalcThread {
       Serial.print("Sum = ");
       Serial.println(output);
 
+
       B.wait();
     }
 };
 
-class Mean : public CalcThread {
+class Mean : CalcThread {
 
   int _id;
   int _iteration;
@@ -105,7 +134,8 @@ class Mean : public CalcThread {
       delay(random(300, 1500)); //do some computation
       _iteration++;
       _num = random(1, 100);
-      /* TODO: Make the pixel at (_id, _iteration) of the LED matrix light up (and stay lit)*/
+      digitalWrite(ledcol[_id],LOW);
+      digitalWrite(ledrow[_iteration],LOW);
       B.wait();
 
       float output = 0.0;
@@ -119,7 +149,7 @@ class Mean : public CalcThread {
     }
 };
 
-class Printer : public CalcThread {
+class Printer : CalcThread {
 
   int _id;
   int _iteration;
@@ -139,7 +169,8 @@ class Printer : public CalcThread {
       delay(random(300, 1500)); //do some computation
       _iteration++;
       _num = random(300, 1500);
-      /* TODO: Make the pixel at (_id, _iteration) of the LED matrix light up (and stay lit)*/
+      digitalWrite(ledcol[_id],LOW);
+      digitalWrite(ledrow[_iteration],LOW);
       B.wait();
 
       Serial.print("Numbers: [");
@@ -155,12 +186,25 @@ class Printer : public CalcThread {
 // the setup routine runs once when you press reset:
 void setup() {
 
+  Sum *s;
+  Mean *m;
+  Printer *p;
+
+    for (int col = 0; col < 5; col++) {
+    pinMode(ledcol[col], OUTPUT);
+    digitalWrite(ledcol[col], HIGH);
+  };
+  for (int row = 0; row < 7; row++) {
+    pinMode(ledrow[row], OUTPUT);
+    digitalWrite(ledrow[row], HIGH);
+  };
+  
   Serial.begin(9600); // open serial terminal
   Process::Init();  // start the threading library
 
-  threads[0] = new Sum(1); //start first thread
-  threads[1] = new Mean(2); //start second thread
-  threads[2] = new Printer(3); //start third thread
+  s = new Sum(1); //start first thread
+  m = new Mean(2); //start second thread
+  p = new Printer(3); //start third thread
 }
 
 // the loop routine runs over and over again forever:
