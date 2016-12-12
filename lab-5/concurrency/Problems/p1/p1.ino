@@ -28,7 +28,7 @@ const int ledrow[7] = {             // PINs for anode rows of LED matrix
 };
 
 void hang_out() {
-  delay(random(100,500)); //waste time
+  delay(random(100,600)); //waste time
 }
 
 class Club {
@@ -55,14 +55,13 @@ class Club {
     }
     
     void redditor_enter() {
-      //delay(100);
       _c->lock();
       if (nf > 0) {
         _c->wait();
       }
       nr++;
-      _c->unlock();
       hang_out();
+      _c->unlock();
     }
 
     void redditor_exit() {
@@ -71,20 +70,19 @@ class Club {
       if (_c->waiting() && nr == 0) { 
         _c->signal();
       } else {
-        _c->unlock();
         hang_out();
+        _c->unlock();
       }
     }
 
     void fourchanner_enter() {
-      //delay(100);
       _c->lock();
       if (nr > 0) {
         _c->wait();
       }
       nf++;
-      _c->unlock(); 
       hang_out();
+      _c->unlock(); 
     }
 
     void fourchanner_exit() {
@@ -93,8 +91,8 @@ class Club {
       if (_c->waiting() && nf == 0) { 
         _c->signal();
       } else {
-        _c->unlock();
         hang_out();
+        _c->unlock();
       } 
     }
 };
