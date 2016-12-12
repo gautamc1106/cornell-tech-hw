@@ -20,10 +20,15 @@
  */
 
 #include <proc.h>
-
+const int ledcol[5] = {             // PINs for cathode columns of LED matrix
+  2, 3, 4, 5, 6
+};
+const int ledrow[7] = {             // PINs for anode rows of LED matrix
+  7, 8, 9, 10, 11, 12, 13
+};
 
 void hang_out() {
-  delay(random(300,1500)); //waste time
+  delay(random(100,500)); //waste time
 }
 
 class Club {
@@ -50,7 +55,7 @@ class Club {
     }
     
     void redditor_enter() {
-      delay(100);
+      //delay(100);
       _c->lock();
       if (nf > 0) {
         _c->wait();
@@ -72,7 +77,7 @@ class Club {
     }
 
     void fourchanner_enter() {
-      delay(100);
+      //delay(100);
       _c->lock();
       if (nr > 0) {
         _c->wait();
@@ -112,7 +117,8 @@ public:
     Serial.print(F("Redditor "));
     Serial.print(_id);
     Serial.println(F(": in the club"));
-    /* TODO: light up column #_id on the LED matrix */
+    // Light up column
+    digitalWrite(ledcol[_id], LOW);
     hang_out();
     //Serial.print(F("Redditor "));
     //Serial.print(_id);
@@ -121,7 +127,9 @@ public:
     Serial.print(F("Redditor "));
     Serial.print(_id);
     Serial.println(F(": out the club"));
-    hang_out();
+    // Turn off column
+    digitalWrite(ledcol[_id], HIGH);
+    //hang_out();
   }
 };
 
@@ -141,7 +149,8 @@ public:
     Serial.print(F("Fourchanner "));
     Serial.print(_id);
     Serial.println(F(": in the club"));
-    /* TODO: light up column #_id on the LED matrix */
+    // Light up column
+    digitalWrite(ledcol[_id], LOW);
     hang_out();
     //Serial.print(F("Fourchanner "));
     //Serial.print(_id);
@@ -150,7 +159,9 @@ public:
     Serial.print(F("Fourchanner "));
     Serial.print(_id);
     Serial.println(F(": out the club"));
-    hang_out();
+    // Turn off column
+    digitalWrite(ledcol[_id], HIGH);
+    //hang_out();
   }
 };
 
@@ -161,13 +172,23 @@ void setup() {
   Redditor *r;
   Fourchanner *f;
   
+  // Initialize LED Matrix
+  for (int col = 0; col < 5; col++) {
+    pinMode(ledcol[col], OUTPUT);
+    digitalWrite(ledcol[col], HIGH);
+  };
+  for (int row = 0; row < 7; row++) {
+    pinMode(ledrow[row], OUTPUT);
+    digitalWrite(ledrow[row], HIGH);
+  };
+  
   Serial.begin(9600); // open serial terminal
   Process::Init();  // start the threading library
   daclub = new Club();
   r = new Redditor(1); //start first thread
   r = new Redditor(2); //start second thread
-  f = new Fourchanner(4); //start third thread
-  f = new Fourchanner(5); //start fourth thread
+  f = new Fourchanner(3); //start third thread
+  f = new Fourchanner(4); //start fourth thread
 }
 
 // the loop routine runs over and over again forever:
